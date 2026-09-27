@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
@@ -12,7 +11,6 @@
 
 <title>Manager Attendance</title>
 
-
 <style>
 
 * {
@@ -21,12 +19,13 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
   background: #f3f5f7;
+  font-family: Arial, sans-serif;
   color: #222;
 }
 
 .container {
+  width: 100%;
   max-width: 520px;
   margin: auto;
   padding: 20px;
@@ -42,14 +41,14 @@ body {
 .logo {
   display: block;
   width: 100%;
-  max-width: 300px;
+  max-width: 310px;
   height: auto;
   margin: 0 auto 15px auto;
 }
 
 h2 {
   text-align: center;
-  margin: 5px 0 8px;
+  margin: 5px 0;
 }
 
 .subtitle {
@@ -61,11 +60,10 @@ h2 {
 .instruction-box {
   background: #f8f9fb;
   border-left: 4px solid #163f73;
-  padding: 14px;
   border-radius: 8px;
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 22px;
+  padding: 14px;
+  margin-bottom: 25px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -80,77 +78,78 @@ select,
 input {
   width: 100%;
   padding: 14px;
-  font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  font-size: 16px;
   background: white;
 }
 
+.dynamic-section {
+  display: none;
+}
 
-/* =============================
-   WORK SCHEDULE
-============================= */
+
+/* WORK SCHEDULE */
 
 .schedule-row {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
 }
 
-.schedule-box {
+.schedule-item {
   flex: 1;
 }
 
-.schedule-to {
+.to-text {
   font-weight: bold;
   color: #666;
-  white-space: nowrap;
 }
 
-#workEndDisplay {
+#workEnd {
+  background: #f2f3f5;
+}
+
+
+/* TIME OUT */
+
+.timeout-box {
   background: #f3f5f7;
-  color: #333;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 17px;
+  font-weight: bold;
 }
 
-.schedule-preview {
-  font-size: 13px;
-  margin-top: 8px;
-  color: #555;
-}
 
+/* GPS */
 
-/* =============================
-   GPS STATUS
-============================= */
-
-#gpsBox {
-  display: none;
+.gps-box {
   margin-top: 12px;
+  background: #f3f5f7;
   padding: 12px;
-  background: #f1f4f7;
   border-radius: 8px;
   font-size: 14px;
 }
 
-.gps-success {
+.success {
   color: #2e7d32;
   font-weight: bold;
 }
 
-.gps-error {
+.error {
   color: #b71c1c;
 }
 
 
-/* =============================
-   CAMERA
-============================= */
+/* CAMERA */
 
 video {
   width: 100%;
-  margin-top: 10px;
-  border-radius: 10px;
   background: #111;
+  border-radius: 10px;
+  margin-top: 10px;
   transform: scaleX(-1);
 }
 
@@ -159,16 +158,14 @@ canvas {
 }
 
 #preview {
-  display: none;
   width: 100%;
-  margin-top: 10px;
+  display: none;
   border-radius: 10px;
+  margin-top: 10px;
 }
 
 
-/* =============================
-   BUTTONS
-============================= */
+/* BUTTONS */
 
 button {
   width: 100%;
@@ -180,57 +177,30 @@ button {
   cursor: pointer;
 }
 
-.enableButton {
+.camera-enable {
   background: #e5e5e5;
-  color: #222;
 }
 
-.cameraButton {
+.take-selfie {
   background: #333;
   color: white;
 }
 
-.submitButton {
+.submit {
   background: #163f73;
   color: white;
   font-weight: bold;
 }
 
-.submitButton:disabled {
+.submit:disabled {
   opacity: .6;
 }
 
 .notice {
-  margin-top: 20px;
-  font-size: 12px;
   color: #666;
+  font-size: 11px;
   line-height: 1.5;
-}
-
-
-/* =============================
-   MOBILE
-============================= */
-
-@media (max-width: 420px) {
-
-  .container {
-    padding: 12px;
-  }
-
-  .card {
-    padding: 20px;
-  }
-
-  .schedule-row {
-    gap: 7px;
-  }
-
-  select,
-  input {
-    font-size: 15px;
-  }
-
+  margin-top: 20px;
 }
 
 </style>
@@ -240,7 +210,6 @@ button {
 
 <body>
 
-
 <div class="container">
 
 <div class="card">
@@ -248,8 +217,8 @@ button {
 
 <img
   src="./logo.png"
-  alt="KHealth Careview Logo"
-  class="logo">
+  class="logo"
+  alt="KHealth Careview">
 
 
 <h2>
@@ -268,8 +237,8 @@ KHealth / Careview Corporation
 
 <br><br>
 
-This Attendance Portal is applicable only for Managers
-who cannot take Biometrics in their assigned workplace.
+This Attendance Portal is applicable only to Managers
+who are unable to use the Biometrics at their assigned workplace.
 
 <br><br>
 
@@ -277,11 +246,10 @@ who cannot take Biometrics in their assigned workplace.
 Biometrics remains the primary attendance record.
 </strong>
 
-This portal shall serve only as a secondary attendance
-record when biometrics cannot be used.
+The Manager Attendance Portal shall serve only as a
+secondary attendance recording method.
 
 </div>
-
 
 
 <form
@@ -293,10 +261,10 @@ record when biometrics cannot be used.
   method="POST">
 
 
+<!-- =============================
+NAME
+============================= -->
 
-<!-- =========================
-     NAME
-========================= -->
 
 <label>
 Name
@@ -356,74 +324,10 @@ Bernardo, Nikolai John
 
 
 
-<!-- =========================
-     WORK SCHEDULE
-========================= -->
+<!-- =============================
+CATEGORY
+============================= -->
 
-<label>
-Work Schedule
-</label>
-
-
-<div class="schedule-row">
-
-
-<div class="schedule-box">
-
-<input
-  type="time"
-  id="workStartInput"
-  required>
-
-</div>
-
-
-<div class="schedule-to">
-to
-</div>
-
-
-<div class="schedule-box">
-
-<input
-  type="text"
-  id="workEndDisplay"
-  placeholder="___"
-  readonly>
-
-</div>
-
-
-</div>
-
-
-<div
-  id="schedulePreview"
-  class="schedule-preview">
-
-Enter your starting time.
-The ending time will automatically be computed
-9 hours later.
-
-</div>
-
-
-<input
-  type="hidden"
-  name="workStart"
-  id="workStart">
-
-
-<input
-  type="hidden"
-  name="workEnd"
-  id="workEnd">
-
-
-
-<!-- =========================
-     CATEGORY
-========================= -->
 
 <label>
 Category
@@ -433,7 +337,8 @@ Category
 <select
   name="category"
   id="category"
-  required>
+  required
+  onchange="categoryChanged()">
 
 <option value="">
 Select Category
@@ -451,9 +356,52 @@ Time-Out
 
 
 
-<!-- =========================
-     LOCATION
-========================= -->
+<!-- =============================
+TIME-IN SECTION
+============================= -->
+
+
+<div
+  id="timeInSection"
+  class="dynamic-section">
+
+
+<label>
+Work Schedule
+</label>
+
+
+<div class="schedule-row">
+
+
+<div class="schedule-item">
+
+<input
+  type="time"
+  id="workStart"
+  onchange="calculateEndTime()">
+
+</div>
+
+
+<div class="to-text">
+to
+</div>
+
+
+<div class="schedule-item">
+
+<input
+  type="text"
+  id="workEnd"
+  readonly
+  placeholder="Automatic">
+
+</div>
+
+
+</div>
+
 
 <label>
 Location
@@ -461,10 +409,8 @@ Location
 
 
 <select
-  name="location"
-  id="location"
-  required
-  onchange="handleLocationChange()">
+  id="timeInLocation"
+  onchange="timeInLocationChanged()">
 
 <option value="">
 Select Location
@@ -513,15 +459,82 @@ Others
 </select>
 
 
+<div
+  id="timeInGpsBox"
+  class="gps-box"
+  style="display:none;">
 
-<div id="gpsBox">
-
-<div id="gpsStatus">
-GPS location will be obtained automatically.
+<div id="timeInGpsStatus">
+GPS location is being obtained...
 </div>
 
 </div>
 
+
+</div>
+
+
+
+<!-- =============================
+TIME-OUT SECTION
+============================= -->
+
+
+<div
+  id="timeOutSection"
+  class="dynamic-section">
+
+
+<label>
+Actual Time-Out
+</label>
+
+
+<div
+  id="actualTimeOut"
+  class="timeout-box">
+
+Waiting for Time-Out selection...
+
+</div>
+
+
+<label>
+Location
+</label>
+
+
+<div class="gps-box">
+
+<div id="timeOutGpsStatus">
+
+Current GPS location will be
+automatically captured.
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- =============================
+SHARED LOCATION DATA
+============================= -->
+
+
+<input
+  type="hidden"
+  name="workSchedule"
+  id="workSchedule">
+
+
+<input
+  type="hidden"
+  name="location"
+  id="finalLocation">
 
 
 <input
@@ -543,9 +556,15 @@ GPS location will be obtained automatically.
 
 
 
-<!-- =========================
-     SELFIE
-========================= -->
+<!-- =============================
+SELFIE
+============================= -->
+
+
+<div
+  id="selfieSection"
+  class="dynamic-section">
+
 
 <label>
 Selfie
@@ -559,9 +578,7 @@ Selfie
 </video>
 
 
-<canvas
-  id="canvas">
-</canvas>
+<canvas id="canvas"></canvas>
 
 
 <img
@@ -571,7 +588,7 @@ Selfie
 
 <button
   type="button"
-  class="enableButton"
+  class="camera-enable"
   onclick="startCamera()">
 
 Enable Camera
@@ -581,13 +598,12 @@ Enable Camera
 
 <button
   type="button"
-  class="cameraButton"
+  class="take-selfie"
   onclick="takeSelfie()">
 
 Take Selfie
 
 </button>
-
 
 
 <textarea
@@ -597,14 +613,9 @@ Take Selfie
 </textarea>
 
 
-
-<!-- =========================
-     SUBMIT
-========================= -->
-
 <button
   type="submit"
-  class="submitButton"
+  class="submit"
   id="submitButton">
 
 SUBMIT ATTENDANCE
@@ -612,21 +623,22 @@ SUBMIT ATTENDANCE
 </button>
 
 
-
 <div class="notice">
 
-By submitting this attendance record, you authorize
-the recording of your attendance time and photograph
-for official attendance monitoring.
+By submitting this record, the Manager confirms
+the accuracy of the attendance information provided.
 
-Device-reported GPS location will also be recorded
-when <strong>Others</strong> is selected as the location.
+The photograph, attendance timestamp and applicable
+device-reported location will be recorded for official
+attendance monitoring.
+
+</div>
+
 
 </div>
 
 
 </form>
-
 
 </div>
 
@@ -646,40 +658,106 @@ let gpsCaptured = false;
 
 
 // ======================================
-// WORK SCHEDULE
+// CATEGORY
 // ======================================
 
-document
-  .getElementById("workStartInput")
-  .addEventListener(
-    "change",
-    calculateWorkSchedule
-  );
 
+function categoryChanged() {
 
-function calculateWorkSchedule() {
-
-  const value =
+  const category =
     document
-      .getElementById(
-        "workStartInput"
-      )
+      .getElementById("category")
       .value;
 
 
-  if (!value) {
-
+  const timeIn =
     document
       .getElementById(
-        "workEndDisplay"
-      )
-      .value = "";
+        "timeInSection"
+      );
 
+
+  const timeOut =
+    document
+      .getElementById(
+        "timeOutSection"
+      );
+
+
+  const selfie =
+    document
+      .getElementById(
+        "selfieSection"
+      );
+
+
+  // RESET
+
+  timeIn.style.display =
+    "none";
+
+  timeOut.style.display =
+    "none";
+
+  selfie.style.display =
+    "none";
+
+
+  clearGps();
+
+
+  if (category === "Time-In") {
+
+    timeIn.style.display =
+      "block";
+
+    selfie.style.display =
+      "block";
+
+  }
+
+
+  if (category === "Time-Out") {
+
+    timeOut.style.display =
+      "block";
+
+    selfie.style.display =
+      "block";
+
+
+    setActualTimeOut();
+
+
+    // GPS is mandatory
+    // for Time-Out
+
+    getGps(
+      "timeOutGpsStatus"
+    );
+
+  }
+
+}
+
+
+
+// ======================================
+// TIME-IN WORK SCHEDULE
+// ======================================
+
+
+function calculateEndTime() {
+
+  const start =
     document
       .getElementById(
         "workStart"
       )
-      .value = "";
+      .value;
+
+
+  if (!start) {
 
     document
       .getElementById(
@@ -693,54 +771,50 @@ function calculateWorkSchedule() {
 
 
   const parts =
-    value.split(":");
+    start.split(":");
 
 
-  const startHour =
+  const hour =
     Number(parts[0]);
 
 
-  const startMinute =
+  const minute =
     Number(parts[1]);
 
 
-  const startTotalMinutes =
-    (startHour * 60) +
-    startMinute;
-
-
-  const endTotalRaw =
-    startTotalMinutes +
+  let totalMinutes =
+    (hour * 60) +
+    minute +
     (9 * 60);
 
 
   const nextDay =
-    endTotalRaw >= 1440;
+    totalMinutes >= 1440;
 
 
-  const endTotalMinutes =
-    endTotalRaw % 1440;
+  totalMinutes =
+    totalMinutes % 1440;
 
 
   const endHour =
     Math.floor(
-      endTotalMinutes / 60
+      totalMinutes / 60
     );
 
 
   const endMinute =
-    endTotalMinutes % 60;
+    totalMinutes % 60;
 
 
-  const formattedStart =
-    formatTime12(
-      startHour,
-      startMinute
+  const startFormatted =
+    formatTime(
+      hour,
+      minute
     );
 
 
-  const formattedEnd =
-    formatTime12(
+  const endFormatted =
+    formatTime(
       endHour,
       endMinute
     );
@@ -748,48 +822,43 @@ function calculateWorkSchedule() {
 
   document
     .getElementById(
-      "workStart"
-    )
-    .value =
-    formattedStart;
-
-
-  document
-    .getElementById(
       "workEnd"
     )
     .value =
-    formattedEnd +
-    (nextDay ? " (+1 day)" : "");
+
+    endFormatted +
+
+    (nextDay
+      ? " (+1 day)"
+      : "");
 
 
   document
     .getElementById(
-      "workEndDisplay"
+      "workSchedule"
     )
     .value =
-    formattedEnd +
-    (nextDay ? " (+1 day)" : "");
 
+    startFormatted +
 
-  document
-    .getElementById(
-      "schedulePreview"
-    )
-    .innerHTML =
-
-    "<strong>" +
-    formattedStart +
     " to " +
-    formattedEnd +
-    (nextDay ? " (+1 day)" : "") +
-    "</strong>";
+
+    endFormatted +
+
+    (nextDay
+      ? " (+1 day)"
+      : "");
 
 }
 
 
 
-function formatTime12(
+// ======================================
+// FORMAT TIME
+// ======================================
+
+
+function formatTime(
   hour,
   minute
 ) {
@@ -804,29 +873,24 @@ function formatTime12(
     hour % 12;
 
 
-  if (
-    displayHour === 0
-  ) {
-
+  if (displayHour === 0) {
     displayHour = 12;
-
   }
 
 
-  const displayMinute =
-    String(minute)
-      .padStart(
-        2,
-        "0"
-      );
-
-
   return (
+
     displayHour +
+
     ":" +
-    displayMinute +
+
+    String(minute)
+      .padStart(2, "0") +
+
     " " +
+
     period
+
   );
 
 }
@@ -834,34 +898,111 @@ function formatTime12(
 
 
 // ======================================
-// LOCATION
+// TIME-OUT DISPLAY
 // ======================================
 
-function handleLocationChange() {
+
+function setActualTimeOut() {
+
+  const now =
+    new Date();
+
+
+  const formatted =
+    now.toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }
+    );
+
+
+  document
+    .getElementById(
+      "actualTimeOut"
+    )
+    .innerText =
+    formatted;
+
+
+  document
+    .getElementById(
+      "workSchedule"
+    )
+    .value =
+    "Actual Time-Out: " +
+    formatted;
+
+}
+
+
+
+// ======================================
+// TIME-IN LOCATION
+// ======================================
+
+
+function timeInLocationChanged() {
 
   const location =
     document
       .getElementById(
-        "location"
+        "timeInLocation"
       )
       .value;
 
 
-  const gpsBox =
+  document
+    .getElementById(
+      "finalLocation"
+    )
+    .value =
+    location;
+
+
+  clearGps();
+
+
+  const box =
     document
       .getElementById(
-        "gpsBox"
+        "timeInGpsBox"
       );
 
 
-  const gpsStatus =
-    document
-      .getElementById(
-        "gpsStatus"
-      );
+  if (location === "Others") {
+
+    box.style.display =
+      "block";
 
 
-  // Clear previous GPS
+    getGps(
+      "timeInGpsStatus"
+    );
+
+  } else {
+
+    box.style.display =
+      "none";
+
+  }
+
+}
+
+
+
+// ======================================
+// CLEAR GPS
+// ======================================
+
+
+function clearGps() {
+
+  gpsCaptured = false;
+
 
   document
     .getElementById(
@@ -883,58 +1024,34 @@ function handleLocationChange() {
     )
     .value = "";
 
-
-  gpsCaptured = false;
-
-
-  if (
-    location === "Others"
-  ) {
-
-    gpsBox.style.display =
-      "block";
-
-
-    gpsStatus.innerHTML =
-      "Getting your current GPS location...";
-
-
-    getLocation();
-
-  } else {
-
-    gpsBox.style.display =
-      "none";
-
-  }
-
 }
 
 
 
 // ======================================
-// GPS
+// GET GPS
 // ======================================
 
-function getLocation() {
+
+function getGps(statusElement) {
 
   const status =
     document
       .getElementById(
-        "gpsStatus"
+        statusElement
       );
 
 
-  if (
-    !navigator.geolocation
-  ) {
+  status.innerHTML =
+    "Getting current GPS location...";
+
+
+  if (!navigator.geolocation) {
 
     status.innerHTML =
-      '<span class="gps-error">' +
-      'GPS location is not supported by this device.' +
+      '<span class="error">' +
+      'GPS is not supported by this device.' +
       '</span>';
-
-    gpsCaptured = false;
 
     return;
 
@@ -972,12 +1089,35 @@ function getLocation() {
           position.coords.accuracy;
 
 
-        gpsCaptured = true;
+        gpsCaptured =
+          true;
+
+
+        // If Time-Out,
+        // location = GPS
+
+        if (
+          document
+            .getElementById(
+              "category"
+            )
+            .value
+          === "Time-Out"
+        ) {
+
+          document
+            .getElementById(
+              "finalLocation"
+            )
+            .value =
+            "Actual GPS Location";
+
+        }
 
 
         status.innerHTML =
 
-          '<span class="gps-success">' +
+          '<span class="success">' +
 
           '✓ GPS Location Captured' +
 
@@ -996,15 +1136,15 @@ function getLocation() {
 
       function(error) {
 
-        gpsCaptured = false;
+        gpsCaptured =
+          false;
 
 
         status.innerHTML =
 
-          '<span class="gps-error">' +
+          '<span class="error">' +
 
-          'GPS location permission is required ' +
-          'when Others is selected.' +
+          'Location permission is required.' +
 
           '</span>';
 
@@ -1026,6 +1166,7 @@ function getLocation() {
 // ======================================
 // CAMERA
 // ======================================
+
 
 async function startCamera() {
 
@@ -1067,8 +1208,9 @@ async function startCamera() {
 
 
 // ======================================
-// TAKE SELFIE
+// SELFIE
 // ======================================
+
 
 function takeSelfie() {
 
@@ -1090,20 +1232,6 @@ function takeSelfie() {
       );
 
 
-  const canvas =
-    document
-      .getElementById(
-        "canvas"
-      );
-
-
-  const preview =
-    document
-      .getElementById(
-        "preview"
-      );
-
-
   if (
     !video.videoWidth ||
     !video.videoHeight
@@ -1116,6 +1244,20 @@ function takeSelfie() {
     return;
 
   }
+
+
+  const canvas =
+    document
+      .getElementById(
+        "canvas"
+      );
+
+
+  const preview =
+    document
+      .getElementById(
+        "preview"
+      );
 
 
   const width = 480;
@@ -1142,10 +1284,9 @@ function takeSelfie() {
 
 
   const ctx =
-    canvas
-      .getContext(
-        "2d"
-      );
+    canvas.getContext(
+      "2d"
+    );
 
 
   ctx.translate(
@@ -1169,10 +1310,10 @@ function takeSelfie() {
   );
 
 
-  const photo =
+  const image =
     canvas.toDataURL(
       "image/jpeg",
-      0.70
+      0.7
     );
 
 
@@ -1181,11 +1322,11 @@ function takeSelfie() {
       "selfieData"
     )
     .value =
-    photo;
+    image;
 
 
   preview.src =
-    photo;
+    image;
 
 
   preview.style.display =
@@ -1200,8 +1341,9 @@ function takeSelfie() {
 
 
 // ======================================
-// SUBMIT VALIDATION
+// FORM VALIDATION
 // ======================================
+
 
 document
   .getElementById(
@@ -1222,22 +1364,6 @@ document
           .value;
 
 
-      const workStart =
-        document
-          .getElementById(
-            "workStart"
-          )
-          .value;
-
-
-      const workEnd =
-        document
-          .getElementById(
-            "workEnd"
-          )
-          .value;
-
-
       const category =
         document
           .getElementById(
@@ -1249,23 +1375,17 @@ document
       const location =
         document
           .getElementById(
-            "location"
+            "finalLocation"
           )
           .value;
 
 
-      if (
-        !name ||
-        !workStart ||
-        !workEnd ||
-        !category ||
-        !location
-      ) {
+      if (!name) {
 
         event.preventDefault();
 
         alert(
-          "Please complete all required fields."
+          "Please select your name."
         );
 
         return;
@@ -1273,32 +1393,12 @@ document
       }
 
 
-      if (
-        location === "Others" &&
-        !gpsCaptured
-      ) {
+      if (!category) {
 
         event.preventDefault();
 
         alert(
-          "GPS location must be captured when Others is selected."
-        );
-
-        getLocation();
-
-        return;
-
-      }
-
-
-      if (
-        !selfieTaken
-      ) {
-
-        event.preventDefault();
-
-        alert(
-          "Please take your selfie before submitting attendance."
+          "Please select Time-In or Time-Out."
         );
 
         return;
@@ -1306,18 +1406,128 @@ document
       }
 
 
-      const submitButton =
+
+      // TIME-IN VALIDATION
+
+      if (category === "Time-In") {
+
+
+        const workStart =
+          document
+            .getElementById(
+              "workStart"
+            )
+            .value;
+
+
+        if (!workStart) {
+
+          event.preventDefault();
+
+          alert(
+            "Please enter your Work Schedule."
+          );
+
+          return;
+
+        }
+
+
+        if (!location) {
+
+          event.preventDefault();
+
+          alert(
+            "Please select your location."
+          );
+
+          return;
+
+        }
+
+
+        if (
+          location === "Others" &&
+          !gpsCaptured
+        ) {
+
+          event.preventDefault();
+
+          alert(
+            "GPS location is required when Others is selected."
+          );
+
+          return;
+
+        }
+
+      }
+
+
+
+      // TIME-OUT VALIDATION
+
+      if (
+        category === "Time-Out"
+      ) {
+
+
+        if (!gpsCaptured) {
+
+          event.preventDefault();
+
+          alert(
+            "Your actual GPS location must be captured before Time-Out."
+          );
+
+
+          getGps(
+            "timeOutGpsStatus"
+          );
+
+
+          return;
+
+        }
+
+
+        // Update displayed
+        // Time-Out immediately
+        // before submission
+
+        setActualTimeOut();
+
+      }
+
+
+
+      // SELFIE
+
+      if (!selfieTaken) {
+
+        event.preventDefault();
+
+        alert(
+          "Please take your selfie before submitting."
+        );
+
+        return;
+
+      }
+
+
+      const button =
         document
           .getElementById(
             "submitButton"
           );
 
 
-      submitButton.disabled =
+      button.disabled =
         true;
 
 
-      submitButton.innerText =
+      button.innerText =
         "SUBMITTING...";
 
     }
