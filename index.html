@@ -1,1287 +1,1074 @@
-<!DOCTYPE html>
-<html lang="en">
+const TIME_ZONE = "Asia/Manila";
 
-<head>
+const ATTENDANCE_SHEET = "Attendance Logs";
+const DIRECTORY_SHEET = "Manager Directory";
+const SELFIE_FOLDER_NAME = "Manager Attendance Selfies";
 
-<meta charset="UTF-8">
+const PORTAL_URL =
+  "https://KHCCVC.github.io/manager-attendance/";
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0">
 
-<title>Manager Attendance</title>
+// ======================================================
+// MANAGER LIST
+// ======================================================
 
-<style>
+const MANAGERS = [
 
-* {
-  box-sizing: border-box;
-}
+  "Dela Cruz, Joselito",
+  "Jacalne, Bryan Cyril",
+  "Dizon, Sheila",
+  "Alido, Ava Maureen",
+  "De Leon, Alexis",
+  "Tan, Charles William",
+  "Kim, Bumsoo",
+  "Barrios, Anthony",
+  "Bernardo, Jean Kristine",
+  "Bernardo, Nikolai John"
 
-body {
-  margin: 0;
-  background: #f3f5f7;
-  font-family: Arial, sans-serif;
-  color: #222;
-}
+];
 
-.container {
-  width: 100%;
-  max-width: 520px;
-  margin: auto;
-  padding: 20px;
-}
 
-.card {
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,.10);
-}
+// ======================================================
+// RUN THIS ONCE AFTER REPLACING CODE.GS
+// ======================================================
 
-/* LOGO */
+function setupSystem() {
 
-.logo {
-  display: block;
-  width: 100%;
-  max-width: 310px;
-  height: auto;
-  margin: 0 auto 15px auto;
-}
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
 
-/* HEADER */
 
-h2 {
-  text-align: center;
-  margin: 5px 0 8px;
-  font-size: 25px;
-}
+  if (!ss) {
 
-.subtitle {
-  text-align: center;
-  color: #666;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-/* INSTRUCTIONS */
-
-.instruction-box {
-  background: #f7f9fc;
-  border-left: 4px solid #163f73;
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 25px;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-/* LABELS */
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-top: 20px;
-  margin-bottom: 8px;
-}
-
-select,
-input,
-textarea {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
-  background: white;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 90px;
-}
-
-/* CONDITIONAL SECTIONS */
-
-.dynamic-section {
-  display: none;
-}
-
-/* WORK SCHEDULE */
-
-.schedule-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.schedule-field {
-  flex: 1;
-}
-
-.to-text {
-  font-weight: bold;
-  color: #666;
-}
-
-#workEndDisplay {
-  background: #f2f3f5;
-}
-
-/* TIME OUT */
-
-.timeout-box {
-  width: 100%;
-  background: #f2f4f7;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 14px;
-  font-weight: bold;
-  font-size: 18px;
-  text-align: center;
-}
-
-.small-note {
-  margin-top: 7px;
-  color: #666;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-/* OFFSITE */
-
-.offsite-box {
-  display: none;
-  margin-top: 15px;
-  padding: 15px;
-  background: #fff8e8;
-  border-radius: 8px;
-  border: 1px solid #ead9a6;
-}
-
-/* GPS */
-
-.gps-box {
-  display: none;
-  margin-top: 15px;
-  padding: 13px;
-  background: #f2f4f7;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.gps-success {
-  color: #2e7d32;
-  font-weight: bold;
-}
-
-.gps-error {
-  color: #b71c1c;
-  font-weight: bold;
-}
-
-/* REMINDER */
-
-.reminder-box {
-  margin-top: 20px;
-  background: #eef5ff;
-  border-radius: 8px;
-  padding: 13px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* CAMERA */
-
-video {
-  width: 100%;
-  margin-top: 10px;
-  background: #111;
-  border-radius: 10px;
-  transform: scaleX(-1);
-}
-
-canvas {
-  display: none;
-}
-
-#preview {
-  display: none;
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 10px;
-}
-
-/* BUTTONS */
-
-button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 14px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.camera-enable {
-  background: #e3e3e3;
-  color: #222;
-}
-
-.camera-button {
-  background: #333;
-  color: white;
-}
-
-.gps-button {
-  background: #e3e3e3;
-  color: #222;
-}
-
-.submit-button {
-  background: #163f73;
-  color: white;
-  font-weight: bold;
-}
-
-.submit-button:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-/* PRIVACY */
-
-.notice {
-  margin-top: 20px;
-  color: #666;
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-/* MOBILE */
-
-@media (max-width: 430px) {
-
-  .container {
-    padding: 12px;
-  }
-
-  .card {
-    padding: 20px;
-  }
-
-  .schedule-row {
-    gap: 7px;
-  }
-
-  select,
-  input,
-  textarea {
-    font-size: 15px;
-  }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-<div class="container">
-
-<div class="card">
-
-
-<!-- LOGO -->
-
-<img
-  src="./logo.png"
-  class="logo"
-  alt="KHealth Careview Logo">
-
-
-<!-- TITLE -->
-
-<h2>
-Manager Attendance
-</h2>
-
-<div class="subtitle">
-KHealth / Careview Corporation
-</div>
-
-
-<!-- INSTRUCTIONS -->
-
-<div class="instruction-box">
-
-<strong>Instructions</strong>
-
-<br><br>
-
-This Attendance Portal is applicable only to Managers
-who are unable to use the Biometrics at their assigned
-workplace.
-
-<br><br>
-
-<strong>
-Biometrics remains the primary attendance record.
-</strong>
-
-This portal shall serve only as the secondary attendance
-record when biometrics cannot be used.
-
-</div>
-
-
-<form
-
-  id="attendanceForm"
-
-  action="https://script.google.com/macros/s/AKfycbz9KSDF_vr-iBfYToJ8vvKWy9SlFsXnw0Si0Au5wevX_G9LQ0mN5vhg9DAiTXpdI14S/exec"
-
-  method="POST">
-
-
-<!-- ==================================================
-NAME
-================================================== -->
-
-<label for="name">
-Name
-</label>
-
-<select
-  name="name"
-  id="name"
-  required>
-
-<option value="">
-Select Name
-</option>
-
-<option value="Dela Cruz, Joselito">
-Dela Cruz, Joselito
-</option>
-
-<option value="Jacalne, Bryan Cyril">
-Jacalne, Bryan Cyril
-</option>
-
-<option value="Dizon, Sheila">
-Dizon, Sheila
-</option>
-
-<option value="Alido, Ava Maureen">
-Alido, Ava Maureen
-</option>
-
-<option value="De Leon, Alexis">
-De Leon, Alexis
-</option>
-
-<option value="Tan, Charles William">
-Tan, Charles William
-</option>
-
-<option value="Kim, Bumsoo">
-Kim, Bumsoo
-</option>
-
-<option value="Barrios, Anthony">
-Barrios, Anthony
-</option>
-
-<option value="Bernardo, Jean Kristine">
-Bernardo, Jean Kristine
-</option>
-
-<option value="Bernardo, Nikolai John">
-Bernardo, Nikolai John
-</option>
-
-</select>
-
-
-<!-- ==================================================
-CATEGORY
-================================================== -->
-
-<label for="category">
-Category
-</label>
-
-<select
-  name="category"
-  id="category"
-  required
-  onchange="categoryChanged()">
-
-<option value="">
-Select Category
-</option>
-
-<option value="Time-In">
-Time-In
-</option>
-
-<option value="Time-Out">
-Time-Out
-</option>
-
-</select>
-
-
-<!-- ==================================================
-TIME-IN SECTION
-================================================== -->
-
-<div
-  id="timeInSection"
-  class="dynamic-section">
-
-
-<!-- WORK SCHEDULE -->
-
-<label>
-Work Schedule
-</label>
-
-<div class="schedule-row">
-
-<div class="schedule-field">
-
-<input
-  type="time"
-  name="workStart"
-  id="workStart"
-  onchange="calculateSchedule()">
-
-</div>
-
-<div class="to-text">
-to
-</div>
-
-<div class="schedule-field">
-
-<input
-  type="text"
-  id="workEndDisplay"
-  placeholder="Automatic"
-  readonly>
-
-</div>
-
-</div>
-
-<div class="small-note">
-
-Enter your starting time. The system will automatically
-compute the designated Time-Out nine (9) hours later.
-
-</div>
-
-
-<!-- LOCATION -->
-
-<label for="timeInLocation">
-Location
-</label>
-
-<select
-  id="timeInLocation"
-  onchange="timeInLocationChanged()">
-
-<option value="">
-Select Location
-</option>
-
-<option value="KHealth Cyclotron Facility">
-KHealth Cyclotron Facility
-</option>
-
-<option value="KHealth Office">
-KHealth Office
-</option>
-
-<option value="NKTI">
-NKTI
-</option>
-
-<option value="CCC-BGC">
-CCC-BGC
-</option>
-
-<option value="AUF">
-AUF
-</option>
-
-<option value="MMMC">
-MMMC
-</option>
-
-<option value="Centuria (PET & Carecall)">
-Centuria (PET & Carecall)
-</option>
-
-<option value="Manila PET">
-Manila PET
-</option>
-
-<option value="BEM Office">
-BEM Office
-</option>
-
-<option value="SM Val">
-SM Val
-</option>
-
-<option value="Others">
-Others
-</option>
-
-</select>
-
-
-<!-- OTHERS -->
-
-<div
-  id="offsiteBox"
-  class="offsite-box">
-
-<label for="offsiteReason">
-Reason why working not on KHealth/Careview site
-</label>
-
-<textarea
-  name="offsiteReason"
-  id="offsiteReason"
-  placeholder="Example: Inspection on AUF site as instructed by Mr. Park"></textarea>
-
-<div class="small-note">
-
-For locations classified as <strong>Others</strong>,
-both the written explanation and your actual GPS location
-are mandatory.
-
-</div>
-
-</div>
-
-
-<!-- TIME-IN GPS -->
-
-<div
-  id="timeInGpsBox"
-  class="gps-box">
-
-<div id="timeInGpsStatus">
-Getting current GPS location...
-</div>
-
-<button
-  type="button"
-  class="gps-button"
-  onclick="getGps('timeInGpsStatus')">
-
-Retry GPS Location
-
-</button>
-
-</div>
-
-
-<!-- MANDATORY EMAIL REMINDER -->
-
-<div class="reminder-box">
-
-<strong>Automatic Time-Out Reminder</strong>
-
-<br><br>
-
-A reminder email will automatically be sent to your
-registered company email address approximately
-<strong>30 minutes before your designated Time-Out.</strong>
-
-<br><br>
-
-This reminder is mandatory and does not require
-separate activation.
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-TIME-OUT SECTION
-================================================== -->
-
-<div
-  id="timeOutSection"
-  class="dynamic-section">
-
-
-<label>
-Actual Time-Out
-</label>
-
-<div
-  id="actualTimeOut"
-  class="timeout-box">
-
---:--:--
-
-</div>
-
-<div class="small-note">
-
-The displayed time is for reference only.
-The official Time-Out will be recorded using the
-attendance system's server timestamp upon submission.
-
-</div>
-
-
-<label>
-Actual Location
-</label>
-
-<div
-  id="timeOutGpsBox"
-  class="gps-box"
-  style="display:block;">
-
-<div id="timeOutGpsStatus">
-Getting your current GPS location...
-</div>
-
-<button
-  type="button"
-  class="gps-button"
-  onclick="getGps('timeOutGpsStatus')">
-
-Retry GPS Location
-
-</button>
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-HIDDEN LOCATION / GPS DATA
-================================================== -->
-
-<input
-  type="hidden"
-  name="location"
-  id="finalLocation">
-
-
-<input
-  type="hidden"
-  name="latitude"
-  id="latitude">
-
-
-<input
-  type="hidden"
-  name="longitude"
-  id="longitude">
-
-
-<input
-  type="hidden"
-  name="accuracy"
-  id="accuracy">
-
-
-<!-- ==================================================
-SELFIE SECTION
-================================================== -->
-
-<div
-  id="selfieSection"
-  class="dynamic-section">
-
-
-<label>
-Selfie
-</label>
-
-<video
-  id="video"
-  autoplay
-  playsinline>
-</video>
-
-<canvas
-  id="canvas">
-</canvas>
-
-<img
-  id="preview"
-  alt="Selfie Preview">
-
-
-<button
-  type="button"
-  class="camera-enable"
-  onclick="startCamera()">
-
-Enable Camera
-
-</button>
-
-
-<button
-  type="button"
-  class="camera-button"
-  onclick="takeSelfie()">
-
-Take Selfie
-
-</button>
-
-
-<textarea
-  name="selfieData"
-  id="selfieData"
-  style="display:none;">
-</textarea>
-
-
-<button
-  type="submit"
-  class="submit-button"
-  id="submitButton">
-
-SUBMIT ATTENDANCE
-
-</button>
-
-
-<div class="notice">
-
-By submitting this attendance record, the Manager confirms
-the accuracy of the information provided and authorizes the
-recording of the attendance timestamp, photograph, and
-applicable device-reported GPS location for official
-attendance monitoring.
-
-</div>
-
-
-</div>
-
-
-</form>
-
-</div>
-
-</div>
-
-
-<script>
-
-
-let cameraStream = null;
-
-let selfieTaken = false;
-
-let gpsCaptured = false;
-
-let clockTimer = null;
-
-
-
-/* ======================================================
-CATEGORY
-====================================================== */
-
-function categoryChanged() {
-
-  const category =
-    document.getElementById("category").value;
-
-
-  const timeInSection =
-    document.getElementById("timeInSection");
-
-
-  const timeOutSection =
-    document.getElementById("timeOutSection");
-
-
-  const selfieSection =
-    document.getElementById("selfieSection");
-
-
-  timeInSection.style.display = "none";
-
-  timeOutSection.style.display = "none";
-
-  selfieSection.style.display = "none";
-
-
-  resetGps();
-
-
-  document.getElementById("finalLocation").value = "";
-
-
-  if (clockTimer) {
-
-    clearInterval(clockTimer);
-
-    clockTimer = null;
+    throw new Error(
+      "Open Apps Script from the Google Sheet using Extensions > Apps Script."
+    );
 
   }
 
 
-  if (category === "Time-In") {
+  ss.setSpreadsheetTimeZone(
+    TIME_ZONE
+  );
 
-    timeInSection.style.display = "block";
 
-    selfieSection.style.display = "block";
+  const props =
+    PropertiesService.getScriptProperties();
+
+
+  props.setProperty(
+    "SPREADSHEET_ID",
+    ss.getId()
+  );
+
+
+  /*
+   * Prevent old attendance rows from accidentally
+   * triggering the new reminder system.
+   *
+   * This is only created once.
+   */
+  if (
+    !props.getProperty(
+      "REMINDER_V2_START"
+    )
+  ) {
+
+    props.setProperty(
+      "REMINDER_V2_START",
+      String(
+        new Date().getTime()
+      )
+    );
 
   }
 
 
-  if (category === "Time-Out") {
+  // ==================================================
+  // ATTENDANCE LOGS
+  // ==================================================
 
-    timeOutSection.style.display = "block";
-
-    selfieSection.style.display = "block";
-
-
-    document.getElementById("finalLocation").value =
-      "Actual GPS Location";
-
-
-    updateTimeOutClock();
+  let attendance =
+    ss.getSheetByName(
+      ATTENDANCE_SHEET
+    );
 
 
-    clockTimer =
-      setInterval(
-        updateTimeOutClock,
-        1000
+  if (!attendance) {
+
+    attendance =
+      ss.insertSheet(
+        ATTENDANCE_SHEET
+      );
+
+  }
+
+
+  const headers = [[
+
+    "Timestamp",
+    "Date",
+    "Name",
+    "Category",
+    "Work Schedule / Actual Time-Out",
+    "Location",
+    "Off-Site Reason",
+    "Recorded Time",
+    "Latitude",
+    "Longitude",
+    "Accuracy (Meters)",
+    "Google Maps",
+    "Selfie",
+    "Manager Email",
+    "Scheduled Time-Out",
+    "Reminder 1 Time",
+    "Reminder 1 Status",
+    "Reminder 1 Sent At",
+    "Reminder 2 Time",
+    "Reminder 2 Status",
+    "Reminder 2 Sent At",
+    "Early Time-Out Reason"
+
+  ]];
+
+
+  attendance
+    .getRange(
+      1,
+      1,
+      1,
+      22
+    )
+    .setValues(
+      headers
+    );
+
+
+  attendance.setFrozenRows(1);
+
+
+  // ==================================================
+  // MANAGER DIRECTORY
+  // ==================================================
+
+  let directory =
+    ss.getSheetByName(
+      DIRECTORY_SHEET
+    );
+
+
+  if (!directory) {
+
+    directory =
+      ss.insertSheet(
+        DIRECTORY_SHEET
+      );
+
+  }
+
+
+  if (
+    directory.getLastRow() === 0
+  ) {
+
+    directory
+      .getRange(
+        1,
+        1,
+        1,
+        2
+      )
+      .setValues([[
+        "Name",
+        "Email"
+      ]]);
+
+
+    const rows =
+      MANAGERS.map(
+        function(name) {
+
+          return [
+            name,
+            ""
+          ];
+
+        }
       );
 
 
-    getGps(
-      "timeOutGpsStatus"
-    );
-
-  }
-
-}
-
-
-
-/* ======================================================
-TIME-IN SCHEDULE
-====================================================== */
-
-function calculateSchedule() {
-
-  const start =
-    document.getElementById("workStart").value;
-
-
-  const endDisplay =
-    document.getElementById("workEndDisplay");
-
-
-  if (!start) {
-
-    endDisplay.value = "";
-
-    return;
+    directory
+      .getRange(
+        2,
+        1,
+        rows.length,
+        2
+      )
+      .setValues(
+        rows
+      );
 
   }
 
 
-  const parts =
-    start.split(":");
+  directory.setFrozenRows(1);
 
 
-  const hour =
-    Number(parts[0]);
+  // ==================================================
+  // SELFIE FOLDER
+  // ==================================================
+
+  getSelfieFolder_();
 
 
-  const minute =
-    Number(parts[1]);
+  // ==================================================
+  // REMINDER TRIGGER
+  // ==================================================
+
+  createReminderTrigger_();
 
 
-  let totalMinutes =
-    (hour * 60) +
-    minute +
-    (9 * 60);
-
-
-  const nextDay =
-    totalMinutes >= 1440;
-
-
-  totalMinutes =
-    totalMinutes % 1440;
-
-
-  const endHour =
-    Math.floor(
-      totalMinutes / 60
-    );
-
-
-  const endMinute =
-    totalMinutes % 60;
-
-
-  const formattedEnd =
-    formatTime12(
-      endHour,
-      endMinute
-    );
-
-
-  endDisplay.value =
-    formattedEnd +
-    (nextDay ? " (+1 day)" : "");
+  SpreadsheetApp.flush();
 
 }
 
 
+// ======================================================
+// WEB APP
+// ALSO HANDLES SCHEDULE LOOKUP FROM GITHUB
+// ======================================================
 
-/* ======================================================
-12-HOUR FORMAT
-====================================================== */
-
-function formatTime12(
-  hour,
-  minute,
-  second = null
-) {
-
-  const period =
-    hour >= 12
-      ? "PM"
-      : "AM";
+function doGet(e) {
 
 
-  let displayHour =
-    hour % 12;
+  if (
+    e &&
+    e.parameter &&
+    e.parameter.action === "getSchedule"
+  ) {
 
-
-  if (displayHour === 0) {
-    displayHour = 12;
-  }
-
-
-  let value =
-    displayHour +
-    ":" +
-    String(minute).padStart(2, "0");
-
-
-  if (second !== null) {
-
-    value +=
-      ":" +
-      String(second).padStart(2, "0");
+    return getScheduleApi_(e);
 
   }
 
 
-  value +=
-    " " +
-    period;
+  return HtmlService.createHtmlOutput(`
 
+    <!DOCTYPE html>
 
-  return value;
+    <html>
+
+      <head>
+
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1">
+
+      </head>
+
+      <body style="
+        font-family:Arial;
+        text-align:center;
+        padding:40px;
+      ">
+
+        <h2>
+          Manager Attendance System
+        </h2>
+
+        <p>
+          Attendance backend is active.
+        </p>
+
+      </body>
+
+    </html>
+
+  `);
 
 }
 
 
+// ======================================================
+// SCHEDULE LOOKUP FOR TIME-OUT
+// ======================================================
 
-/* ======================================================
-TIME-OUT CLOCK
-====================================================== */
+function getScheduleApi_(e) {
 
-function updateTimeOutClock() {
-
-  const now =
-    new Date();
+  const name =
+    String(
+      e.parameter.name || ""
+    ).trim();
 
 
-  const formatted =
-    formatTime12(
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds()
+  let callback =
+    String(
+      e.parameter.callback ||
+      "receiveScheduleLookup"
     );
 
 
-  document
-    .getElementById("actualTimeOut")
-    .innerText =
-    formatted;
+  if (
+    !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(
+      callback
+    )
+  ) {
 
-}
+    callback =
+      "receiveScheduleLookup";
 
-
-
-/* ======================================================
-TIME-IN LOCATION
-====================================================== */
-
-function timeInLocationChanged() {
-
-  const location =
-    document
-      .getElementById("timeInLocation")
-      .value;
+  }
 
 
-  const offsiteBox =
-    document.getElementById("offsiteBox");
+  const ss =
+    getSpreadsheet_();
 
 
-  const offsiteReason =
-    document.getElementById("offsiteReason");
-
-
-  const gpsBox =
-    document.getElementById("timeInGpsBox");
-
-
-  document
-    .getElementById("finalLocation")
-    .value =
-    location;
-
-
-  resetGps();
-
-
-  if (location === "Others") {
-
-    offsiteBox.style.display =
-      "block";
-
-
-    gpsBox.style.display =
-      "block";
-
-
-    offsiteReason.required =
-      true;
-
-
-    document
-      .getElementById("timeInGpsStatus")
-      .innerHTML =
-      "Getting your current GPS location...";
-
-
-    getGps(
-      "timeInGpsStatus"
+  const sheet =
+    ss.getSheetByName(
+      ATTENDANCE_SHEET
     );
+
+
+  const shift =
+    findOpenTimeIn_(
+      sheet,
+      name
+    );
+
+
+  let result;
+
+
+  if (!shift.found) {
+
+    result = {
+
+      found: false,
+
+      alreadyTimedOut:
+        shift.alreadyTimedOut || false,
+
+      message:
+
+        shift.alreadyTimedOut
+
+          ? "A Time-Out has already been recorded for your latest Time-In."
+
+          : "No open Time-In record was found."
+
+    };
 
   } else {
 
-    offsiteBox.style.display =
-      "none";
+    result = {
 
+      found: true,
 
-    gpsBox.style.display =
-      "none";
+      scheduledTimeOutMs:
+        shift.scheduledTimeOut.getTime(),
 
+      scheduledTimeOutDisplay:
+        Utilities.formatDate(
+          shift.scheduledTimeOut,
+          TIME_ZONE,
+          "hh:mm a"
+        )
 
-    offsiteReason.required =
-      false;
-
-
-    offsiteReason.value =
-      "";
-
-  }
-
-}
-
-
-
-/* ======================================================
-RESET GPS
-====================================================== */
-
-function resetGps() {
-
-  gpsCaptured = false;
-
-
-  document
-    .getElementById("latitude")
-    .value = "";
-
-
-  document
-    .getElementById("longitude")
-    .value = "";
-
-
-  document
-    .getElementById("accuracy")
-    .value = "";
-
-}
-
-
-
-/* ======================================================
-GET GPS
-====================================================== */
-
-function getGps(statusId) {
-
-  const status =
-    document.getElementById(statusId);
-
-
-  if (!navigator.geolocation) {
-
-    status.innerHTML =
-      '<span class="gps-error">' +
-      'GPS location is not supported by this device.' +
-      '</span>';
-
-    gpsCaptured = false;
-
-    return;
+    };
 
   }
 
 
-  status.innerHTML =
-    "Getting current GPS location...";
+  return ContentService
+    .createTextOutput(
 
+      callback +
+      "(" +
+      JSON.stringify(result) +
+      ");"
 
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-
-      document
-        .getElementById("latitude")
-        .value =
-        position.coords.latitude;
-
-
-      document
-        .getElementById("longitude")
-        .value =
-        position.coords.longitude;
-
-
-      document
-        .getElementById("accuracy")
-        .value =
-        position.coords.accuracy;
-
-
-      gpsCaptured = true;
-
-
-      status.innerHTML =
-
-        '<span class="gps-success">' +
-
-        '✓ GPS Location Captured' +
-
-        '</span><br>' +
-
-        'Accuracy: approximately ' +
-
-        Math.round(
-          position.coords.accuracy
-        ) +
-
-        ' meters';
-
-    },
-
-
-    function(error) {
-
-
-      gpsCaptured = false;
-
-
-      status.innerHTML =
-
-        '<span class="gps-error">' +
-
-        'Location permission is required. ' +
-
-        'Please allow location access and press Retry GPS Location.' +
-
-        '</span>';
-
-    },
-
-
-    {
-      enableHighAccuracy: true,
-      timeout: 20000,
-      maximumAge: 0
-    }
-
-  );
+    )
+    .setMimeType(
+      ContentService.MimeType.JAVASCRIPT
+    );
 
 }
 
 
+// ======================================================
+// RECEIVE ATTENDANCE SUBMISSION
+// ======================================================
 
-/* ======================================================
-CAMERA
-====================================================== */
-
-async function startCamera() {
+function doPost(e) {
 
   try {
 
 
-    cameraStream =
-      await navigator.mediaDevices.getUserMedia({
+    if (
+      !e ||
+      !e.parameter
+    ) {
 
-        video: {
-          facingMode: "user"
-        },
+      throw new Error(
+        "No attendance information was received."
+      );
 
-        audio: false
-
-      });
+    }
 
 
-    document
-      .getElementById("video")
-      .srcObject =
-      cameraStream;
+    const ss =
+      getSpreadsheet_();
+
+
+    const sheet =
+      ss.getSheetByName(
+        ATTENDANCE_SHEET
+      );
+
+
+    if (!sheet) {
+
+      throw new Error(
+        "Attendance Logs sheet was not found."
+      );
+
+    }
+
+
+    // ==================================================
+    // FORM DATA
+    // ==================================================
+
+    const name =
+      String(
+        e.parameter.name || ""
+      ).trim();
+
+
+    const category =
+      String(
+        e.parameter.category || ""
+      ).trim();
+
+
+    const workStart =
+      String(
+        e.parameter.workStart || ""
+      ).trim();
+
+
+    const location =
+      String(
+        e.parameter.location || ""
+      ).trim();
+
+
+    const offsiteReason =
+      String(
+        e.parameter.offsiteReason || ""
+      ).trim();
+
+
+    const earlyTimeOutReason =
+      String(
+        e.parameter.earlyTimeOutReason || ""
+      ).trim();
+
+
+    const latitude =
+      String(
+        e.parameter.latitude || ""
+      ).trim();
+
+
+    const longitude =
+      String(
+        e.parameter.longitude || ""
+      ).trim();
+
+
+    const accuracy =
+      String(
+        e.parameter.accuracy || ""
+      ).trim();
+
+
+    const selfieData =
+      String(
+        e.parameter.selfieData || ""
+      ).trim();
+
+
+    // ==================================================
+    // BASIC VALIDATION
+    // ==================================================
+
+    if (!name) {
+
+      throw new Error(
+        "Manager Name is required."
+      );
+
+    }
+
+
+    if (
+      !MANAGERS.includes(name)
+    ) {
+
+      throw new Error(
+        "Invalid Manager Name."
+      );
+
+    }
+
+
+    if (
+      category !== "Time-In" &&
+      category !== "Time-Out"
+    ) {
+
+      throw new Error(
+        "Please select Time-In or Time-Out."
+      );
+
+    }
+
+
+    if (!selfieData) {
+
+      throw new Error(
+        "Selfie is required."
+      );
+
+    }
+
+
+    // ==================================================
+    // OFFICIAL SERVER TIME
+    // ==================================================
+
+    const now =
+      new Date();
+
+
+    const date =
+      Utilities.formatDate(
+        now,
+        TIME_ZONE,
+        "MM/dd/yyyy"
+      );
+
+
+    const recordedTime =
+      Utilities.formatDate(
+        now,
+        TIME_ZONE,
+        "hh:mm:ss a"
+      );
+
+
+    // ==================================================
+    // OUTPUT VARIABLES
+    // ==================================================
+
+    let finalWorkSchedule = "";
+
+    let finalLocation = "";
+
+    let finalOffsiteReason = "";
+
+    let finalEarlyTimeOutReason = "";
+
+    let managerEmail = "";
+
+    let scheduledTimeOut = "";
+
+    let reminder1Time = "";
+
+    let reminder1Status = "";
+
+    let reminder2Time = "";
+
+    let reminder2Status = "";
+
+
+    // ==================================================
+    // TIME-IN
+    // ==================================================
+
+    if (
+      category === "Time-In"
+    ) {
+
+
+      if (!workStart) {
+
+        throw new Error(
+          "Work Schedule is required."
+        );
+
+      }
+
+
+      if (!location) {
+
+        throw new Error(
+          "Location is required."
+        );
+
+      }
+
+
+      managerEmail =
+        getManagerEmail_(
+          name
+        );
+
+
+      if (!managerEmail) {
+
+        throw new Error(
+          "No email address is registered for this Manager. Please contact HR."
+        );
+
+      }
+
+
+      const schedule =
+        calculateSchedule_(
+          workStart,
+          now
+        );
+
+
+      finalWorkSchedule =
+        schedule.display;
+
+
+      scheduledTimeOut =
+        schedule.end;
+
+
+      /*
+       * EMAIL #1:
+       * Actual scheduled Time-Out
+       */
+
+      reminder1Time =
+        new Date(
+          scheduledTimeOut.getTime()
+        );
+
+
+      reminder1Status =
+        "Pending";
+
+
+      /*
+       * EMAIL #2:
+       * 10 minutes after scheduled Time-Out
+       */
+
+      reminder2Time =
+        new Date(
+          scheduledTimeOut.getTime() +
+          (10 * 60 * 1000)
+        );
+
+
+      reminder2Status =
+        "Pending";
+
+
+      finalLocation =
+        location;
+
+
+      // =================================================
+      // OTHERS
+      // =================================================
+
+      if (
+        location === "Others"
+      ) {
+
+
+        if (!offsiteReason) {
+
+          throw new Error(
+            "Please provide the reason why you are working outside a KHealth/Careview site."
+          );
+
+        }
+
+
+        if (
+          !latitude ||
+          !longitude
+        ) {
+
+          throw new Error(
+            "GPS location is required when Others is selected."
+          );
+
+        }
+
+
+        finalOffsiteReason =
+          offsiteReason;
+
+      }
+
+
+      /*
+       * Cancel any older pending Time-In reminder
+       * for the same Manager.
+       */
+
+      cancelPreviousPendingShift_(
+        sheet,
+        name
+      );
+
+    }
+
+
+    // ==================================================
+    // TIME-OUT
+    // ==================================================
+
+    if (
+      category === "Time-Out"
+    ) {
+
+
+      if (
+        !latitude ||
+        !longitude
+      ) {
+
+        throw new Error(
+          "Actual GPS location is required for Time-Out."
+        );
+
+      }
+
+
+      const shift =
+        findOpenTimeIn_(
+          sheet,
+          name
+        );
+
+
+      if (!shift.found) {
+
+
+        if (
+          shift.alreadyTimedOut
+        ) {
+
+          throw new Error(
+            "A Time-Out has already been recorded for your latest Time-In."
+          );
+
+        }
+
+
+        throw new Error(
+          "No open Time-In record was found."
+        );
+
+      }
+
+
+      scheduledTimeOut =
+        shift.scheduledTimeOut;
+
+
+      // =================================================
+      // EARLY TIME-OUT VALIDATION
+      // =================================================
+
+      if (
+        now.getTime() <
+        scheduledTimeOut.getTime()
+      ) {
+
+
+        if (
+          !earlyTimeOutReason
+        ) {
+
+
+          const scheduledDisplay =
+            Utilities.formatDate(
+              scheduledTimeOut,
+              TIME_ZONE,
+              "hh:mm a"
+            );
+
+
+          throw new Error(
+
+            "Your Time-Out today is scheduled at " +
+
+            scheduledDisplay +
+
+            ". Please provide the reason for your early Time-Out."
+
+          );
+
+        }
+
+
+        finalEarlyTimeOutReason =
+          earlyTimeOutReason;
+
+      }
+
+
+      /*
+       * Official Time-Out comes from
+       * Apps Script server time.
+       */
+
+      finalWorkSchedule =
+        "Actual Time-Out: " +
+        recordedTime;
+
+
+      finalLocation =
+        "Actual GPS Location";
+
+
+      managerEmail =
+        getManagerEmail_(
+          name
+        );
+
+
+      /*
+       * Stop remaining reminder emails.
+       */
+
+      cancelShiftReminders_(
+        sheet,
+        shift.row
+      );
+
+    }
+
+
+    // ==================================================
+    // GPS VALIDATION
+    // ==================================================
+
+    if (
+      latitude ||
+      longitude
+    ) {
+
+
+      const lat =
+        Number(latitude);
+
+
+      const lng =
+        Number(longitude);
+
+
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+      ) {
+
+        throw new Error(
+          "Invalid GPS coordinates."
+        );
+
+      }
+
+
+      if (
+        lat < -90 ||
+        lat > 90 ||
+        lng < -180 ||
+        lng > 180
+      ) {
+
+        throw new Error(
+          "Invalid GPS coordinates."
+        );
+
+      }
+
+    }
+
+
+    // ==================================================
+    // GOOGLE MAPS LINK
+    // ==================================================
+
+    let mapLink = "";
+
+
+    if (
+      latitude &&
+      longitude
+    ) {
+
+      mapLink =
+
+        "https://www.google.com/maps?q=" +
+
+        latitude +
+
+        "," +
+
+        longitude;
+
+    }
+
+
+    // ==================================================
+    // SAVE SELFIE
+    // ==================================================
+
+    const selfieLink =
+      saveSelfie_(
+        selfieData,
+        name,
+        category,
+        now
+      );
+
+
+    // ==================================================
+    // WRITE ATTENDANCE
+    // ==================================================
+
+    const lock =
+      LockService.getScriptLock();
+
+
+    lock.waitLock(
+      30000
+    );
+
+
+    try {
+
+
+      sheet.appendRow([
+
+        now,
+
+        date,
+
+        name,
+
+        category,
+
+        finalWorkSchedule,
+
+        finalLocation,
+
+        finalOffsiteReason,
+
+        recordedTime,
+
+        latitude,
+
+        longitude,
+
+        accuracy,
+
+        mapLink,
+
+        selfieLink,
+
+        managerEmail,
+
+        scheduledTimeOut,
+
+        reminder1Time,
+
+        reminder1Status,
+
+        "",
+
+        reminder2Time,
+
+        reminder2Status,
+
+        "",
+
+        finalEarlyTimeOutReason
+
+      ]);
+
+
+      const row =
+        sheet.getLastRow();
+
+
+      sheet
+        .getRange(
+          row,
+          1
+        )
+        .setNumberFormat(
+          "MM/dd/yyyy hh:mm:ss AM/PM"
+        );
+
+
+      sheet
+        .getRange(
+          row,
+          15,
+          1,
+          7
+        )
+        .setNumberFormat(
+          "MM/dd/yyyy hh:mm:ss AM/PM"
+        );
+
+
+    } finally {
+
+
+      lock.releaseLock();
+
+    }
+
+
+    // ==================================================
+    // SUCCESS PAGE
+    // ==================================================
+
+    return successPage_(
+
+      name,
+
+      category,
+
+      finalWorkSchedule,
+
+      recordedTime,
+
+      finalEarlyTimeOutReason
+
+    );
 
 
   } catch (error) {
 
 
-    alert(
-      "Camera permission is required. Please allow camera access."
+    return errorPage_(
+      error.message
     );
 
   }
@@ -1289,332 +1076,1784 @@ async function startCamera() {
 }
 
 
+// ======================================================
+// FIND LATEST OPEN TIME-IN
+// ======================================================
 
-/* ======================================================
-TAKE SELFIE
-====================================================== */
-
-function takeSelfie() {
-
-  if (!cameraStream) {
-
-    alert(
-      "Please enable the camera first."
-    );
-
-    return;
-
-  }
+function findOpenTimeIn_(
+  sheet,
+  managerName
+) {
 
 
-  const video =
-    document.getElementById("video");
+  const lastRow =
+    sheet.getLastRow();
 
 
   if (
-    !video.videoWidth ||
-    !video.videoHeight
+    lastRow < 2
   ) {
 
-    alert(
-      "Please wait for the camera to finish loading."
+    return {
+      found: false
+    };
+
+  }
+
+
+  const data =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        22
+      )
+      .getValues();
+
+
+  for (
+    let i =
+      data.length - 1;
+
+    i >= 0;
+
+    i--
+  ) {
+
+
+    const name =
+      String(
+        data[i][2] || ""
+      ).trim();
+
+
+    const category =
+      String(
+        data[i][3] || ""
+      ).trim();
+
+
+    if (
+      name !== managerName ||
+      category !== "Time-In"
+    ) {
+
+      continue;
+
+    }
+
+
+    const timeInTimestamp =
+      data[i][0];
+
+
+    const scheduled =
+      data[i][14];
+
+
+    if (
+      !(timeInTimestamp instanceof Date)
+    ) {
+
+      continue;
+
+    }
+
+
+    /*
+     * Ignore very old Time-In records.
+     * 36 hours allows schedules that cross midnight.
+     */
+
+    const ageHours =
+
+      (
+        new Date().getTime() -
+        timeInTimestamp.getTime()
+      )
+
+      /
+
+      (60 * 60 * 1000);
+
+
+    if (
+      ageHours > 36
+    ) {
+
+      continue;
+
+    }
+
+
+    const timedOut =
+      hasTimeOutAfter_(
+
+        data,
+
+        managerName,
+
+        timeInTimestamp
+
+      );
+
+
+    if (timedOut) {
+
+      return {
+
+        found: false,
+
+        alreadyTimedOut: true
+
+      };
+
+    }
+
+
+    if (
+      scheduled instanceof Date &&
+      !isNaN(
+        scheduled.getTime()
+      )
+    ) {
+
+      return {
+
+        found: true,
+
+        row:
+          i + 2,
+
+        scheduledTimeOut:
+          scheduled,
+
+        timeInTimestamp:
+          timeInTimestamp
+
+      };
+
+    }
+
+  }
+
+
+  return {
+    found: false
+  };
+
+}
+
+
+// ======================================================
+// CHECK IF TIME-OUT EXISTS AFTER TIME-IN
+// ======================================================
+
+function hasTimeOutAfter_(
+  data,
+  managerName,
+  timeInTimestamp
+) {
+
+
+  const start =
+    timeInTimestamp.getTime();
+
+
+  for (
+    let i = 0;
+    i < data.length;
+    i++
+  ) {
+
+
+    const name =
+      String(
+        data[i][2] || ""
+      ).trim();
+
+
+    const category =
+      String(
+        data[i][3] || ""
+      ).trim();
+
+
+    const timestamp =
+      data[i][0];
+
+
+    if (
+      name === managerName &&
+      category === "Time-Out" &&
+      timestamp instanceof Date &&
+      timestamp.getTime() >
+      start
+    ) {
+
+      return true;
+
+    }
+
+  }
+
+
+  return false;
+
+}
+
+
+// ======================================================
+// CANCEL REMINDERS AFTER TIME-OUT
+// ======================================================
+
+function cancelShiftReminders_(
+  sheet,
+  row
+) {
+
+
+  const reminder1 =
+    String(
+      sheet
+        .getRange(
+          row,
+          17
+        )
+        .getValue() || ""
     );
+
+
+  const reminder2 =
+    String(
+      sheet
+        .getRange(
+          row,
+          20
+        )
+        .getValue() || ""
+    );
+
+
+  if (
+    reminder1 === "Pending"
+  ) {
+
+    sheet
+      .getRange(
+        row,
+        17
+      )
+      .setValue(
+        "Cancelled - Time-Out Completed"
+      );
+
+  }
+
+
+  if (
+    reminder2 === "Pending"
+  ) {
+
+    sheet
+      .getRange(
+        row,
+        20
+      )
+      .setValue(
+        "Cancelled - Time-Out Completed"
+      );
+
+  }
+
+}
+
+
+// ======================================================
+// CANCEL PREVIOUS PENDING SHIFT
+// ======================================================
+
+function cancelPreviousPendingShift_(
+  sheet,
+  managerName
+) {
+
+
+  const lastRow =
+    sheet.getLastRow();
+
+
+  if (
+    lastRow < 2
+  ) {
 
     return;
 
   }
 
 
-  const canvas =
-    document.getElementById("canvas");
+  const data =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        22
+      )
+      .getValues();
 
 
-  const preview =
-    document.getElementById("preview");
+  for (
+    let i = 0;
+    i < data.length;
+    i++
+  ) {
 
 
-  const width =
-    480;
+    const name =
+      String(
+        data[i][2] || ""
+      ).trim();
 
 
-  const height =
-    Math.round(
-      width *
-      video.videoHeight /
-      video.videoWidth
-    );
+    const category =
+      String(
+        data[i][3] || ""
+      ).trim();
 
 
-  canvas.width =
-    width;
+    if (
+      name !== managerName ||
+      category !== "Time-In"
+    ) {
+
+      continue;
+
+    }
 
 
-  canvas.height =
-    height;
+    if (
+      String(
+        data[i][16] || ""
+      ) === "Pending"
+    ) {
+
+      sheet
+        .getRange(
+          i + 2,
+          17
+        )
+        .setValue(
+          "Superseded"
+        );
+
+    }
 
 
-  const ctx =
-    canvas.getContext("2d");
+    if (
+      String(
+        data[i][19] || ""
+      ) === "Pending"
+    ) {
 
+      sheet
+        .getRange(
+          i + 2,
+          20
+        )
+        .setValue(
+          "Superseded"
+        );
 
-  ctx.translate(
-    width,
-    0
-  );
+    }
 
-
-  ctx.scale(
-    -1,
-    1
-  );
-
-
-  ctx.drawImage(
-    video,
-    0,
-    0,
-    width,
-    height
-  );
-
-
-  const photo =
-    canvas.toDataURL(
-      "image/jpeg",
-      0.70
-    );
-
-
-  document
-    .getElementById("selfieData")
-    .value =
-    photo;
-
-
-  preview.src =
-    photo;
-
-
-  preview.style.display =
-    "block";
-
-
-  selfieTaken =
-    true;
+  }
 
 }
 
 
+// ======================================================
+// AUTOMATIC REMINDER CHECKER
+// ======================================================
 
-/* ======================================================
-FORM VALIDATION
-====================================================== */
+function sendDueAttendanceReminders() {
 
-document
-  .getElementById("attendanceForm")
-  .addEventListener(
 
-    "submit",
+  const ss =
+    getSpreadsheet_();
 
-    function(event) {
 
+  const sheet =
+    ss.getSheetByName(
+      ATTENDANCE_SHEET
+    );
 
-      const name =
-        document
-          .getElementById("name")
-          .value;
 
+  if (!sheet) {
 
-      const category =
-        document
-          .getElementById("category")
-          .value;
+    return;
 
+  }
 
-      if (!name) {
 
-        event.preventDefault();
+  const lastRow =
+    sheet.getLastRow();
 
-        alert(
-          "Please select your Name."
-        );
 
-        return;
+  if (
+    lastRow < 2
+  ) {
 
-      }
+    return;
 
+  }
 
-      if (!category) {
 
-        event.preventDefault();
+  const data =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        22
+      )
+      .getValues();
 
-        alert(
-          "Please select Time-In or Time-Out."
-        );
 
-        return;
+  const now =
+    new Date();
 
-      }
 
+  const startMs =
+    Number(
 
-      /* ---------------------------------------------
-      TIME-IN
-      --------------------------------------------- */
+      PropertiesService
+        .getScriptProperties()
+        .getProperty(
+          "REMINDER_V2_START"
+        )
 
-      if (category === "Time-In") {
+      || 0
 
+    );
 
-        const workStart =
-          document
-            .getElementById("workStart")
-            .value;
 
+  for (
+    let i = 0;
+    i < data.length;
+    i++
+  ) {
 
-        const location =
-          document
-            .getElementById("timeInLocation")
-            .value;
 
+    const row =
+      i + 2;
 
-        if (!workStart) {
 
-          event.preventDefault();
+    const timestamp =
+      data[i][0];
 
-          alert(
-            "Please enter your Work Schedule."
-          );
 
-          return;
+    if (
+      !(timestamp instanceof Date)
+    ) {
 
-        }
-
-
-        if (!location) {
-
-          event.preventDefault();
-
-          alert(
-            "Please select your Location."
-          );
-
-          return;
-
-        }
-
-
-        if (location === "Others") {
-
-
-          const reason =
-            document
-              .getElementById("offsiteReason")
-              .value
-              .trim();
-
-
-          if (!reason) {
-
-            event.preventDefault();
-
-            alert(
-              "Please provide the reason why you are working outside a KHealth/Careview site."
-            );
-
-            return;
-
-          }
-
-
-          if (!gpsCaptured) {
-
-            event.preventDefault();
-
-            alert(
-              "Your GPS location must be captured when Others is selected."
-            );
-
-
-            getGps(
-              "timeInGpsStatus"
-            );
-
-
-            return;
-
-          }
-
-        }
-
-      }
-
-
-      /* ---------------------------------------------
-      TIME-OUT
-      --------------------------------------------- */
-
-      if (category === "Time-Out") {
-
-
-        if (!gpsCaptured) {
-
-          event.preventDefault();
-
-          alert(
-            "Your actual GPS location must be captured before Time-Out can be submitted."
-          );
-
-
-          getGps(
-            "timeOutGpsStatus"
-          );
-
-
-          return;
-
-        }
-
-      }
-
-
-      /* ---------------------------------------------
-      SELFIE
-      --------------------------------------------- */
-
-      if (!selfieTaken) {
-
-        event.preventDefault();
-
-        alert(
-          "Please take your Selfie before submitting attendance."
-        );
-
-        return;
-
-      }
-
-
-      /* ---------------------------------------------
-      DISABLE SUBMIT
-      --------------------------------------------- */
-
-      const button =
-        document
-          .getElementById("submitButton");
-
-
-      button.disabled =
-        true;
-
-
-      button.innerText =
-        "SUBMITTING...";
+      continue;
 
     }
 
+
+    if (
+      timestamp.getTime() <
+      startMs
+    ) {
+
+      continue;
+
+    }
+
+
+    const name =
+      String(
+        data[i][2] || ""
+      ).trim();
+
+
+    const category =
+      String(
+        data[i][3] || ""
+      ).trim();
+
+
+    if (
+      category !== "Time-In"
+    ) {
+
+      continue;
+
+    }
+
+
+    // ==================================================
+    // STOP IF ALREADY TIMED OUT
+    // ==================================================
+
+    if (
+      hasTimeOutAfter_(
+        data,
+        name,
+        timestamp
+      )
+    ) {
+
+
+      cancelShiftReminders_(
+        sheet,
+        row
+      );
+
+
+      continue;
+
+    }
+
+
+    const email =
+      String(
+        data[i][13] || ""
+      ).trim();
+
+
+    const scheduledTimeOut =
+      data[i][14];
+
+
+    const reminder1Time =
+      data[i][15];
+
+
+    const reminder1Status =
+      String(
+        data[i][16] || ""
+      ).trim();
+
+
+    const reminder2Time =
+      data[i][18];
+
+
+    const reminder2Status =
+      String(
+        data[i][19] || ""
+      ).trim();
+
+
+    if (
+      !email ||
+      !(scheduledTimeOut instanceof Date)
+    ) {
+
+      continue;
+
+    }
+
+
+    // ==================================================
+    // EMAIL #1
+    // AT ACTUAL SCHEDULED TIME-OUT
+    // ==================================================
+
+    if (
+      reminder1Status === "Pending" &&
+      reminder1Time instanceof Date &&
+      now >= reminder1Time
+    ) {
+
+
+      sendTimeOutEmail_(
+
+        email,
+
+        name,
+
+        scheduledTimeOut,
+
+        1
+
+      );
+
+
+      sheet
+        .getRange(
+          row,
+          17
+        )
+        .setValue(
+          "Sent"
+        );
+
+
+      sheet
+        .getRange(
+          row,
+          18
+        )
+        .setValue(
+          new Date()
+        );
+
+    }
+
+
+    // ==================================================
+    // EMAIL #2
+    // 10 MINUTES AFTER SCHEDULED TIME-OUT
+    // ==================================================
+
+    if (
+      reminder2Status === "Pending" &&
+      reminder2Time instanceof Date &&
+      now >= reminder2Time
+    ) {
+
+
+      /*
+       * Refresh records first to make sure
+       * the Manager did not Time-Out moments ago.
+       */
+
+      const refreshed =
+        sheet
+          .getRange(
+            2,
+            1,
+            sheet.getLastRow() - 1,
+            22
+          )
+          .getValues();
+
+
+      if (
+        hasTimeOutAfter_(
+          refreshed,
+          name,
+          timestamp
+        )
+      ) {
+
+
+        sheet
+          .getRange(
+            row,
+            20
+          )
+          .setValue(
+            "Cancelled - Time-Out Completed"
+          );
+
+
+        continue;
+
+      }
+
+
+      sendTimeOutEmail_(
+
+        email,
+
+        name,
+
+        scheduledTimeOut,
+
+        2
+
+      );
+
+
+      sheet
+        .getRange(
+          row,
+          20
+        )
+        .setValue(
+          "Sent"
+        );
+
+
+      sheet
+        .getRange(
+          row,
+          21
+        )
+        .setValue(
+          new Date()
+        );
+
+    }
+
+  }
+
+}
+
+
+// ======================================================
+// EMAIL NOTIFICATIONS
+// ======================================================
+
+function sendTimeOutEmail_(
+  email,
+  managerName,
+  scheduledTimeOut,
+  reminderNumber
+) {
+
+
+  const scheduled =
+    Utilities.formatDate(
+      scheduledTimeOut,
+      TIME_ZONE,
+      "hh:mm a"
+    );
+
+
+  const timeOutLink =
+
+    PORTAL_URL +
+
+    "?name=" +
+
+    encodeURIComponent(
+      managerName
+    ) +
+
+    "&category=Time-Out";
+
+
+  let subject = "";
+
+  let plainMessage = "";
+
+  let htmlMessage = "";
+
+
+  // ==================================================
+  // EMAIL #1
+  // ==================================================
+
+  if (
+    reminderNumber === 1
+  ) {
+
+
+    subject =
+
+      "[HR] Manager Time-Out Reminder – " +
+
+      scheduled;
+
+
+    plainMessage =
+
+      "Your designated Time-Out is " +
+
+      scheduled +
+
+      ". Please record your Time-Out through the Manager Attendance Portal.";
+
+
+    htmlMessage = `
+
+      <p>
+
+        Your designated Time-Out is
+        <strong>${escapeHtml_(scheduled)}</strong>.
+
+      </p>
+
+      <p>
+
+        Please record your Time-Out through the
+        Manager Attendance Portal.
+
+      </p>
+
+    `;
+
+  }
+
+
+  // ==================================================
+  // EMAIL #2
+  // ==================================================
+
+  else {
+
+
+    subject =
+
+      "[HR] Second Time-Out Reminder – Daily Attendance Recording";
+
+
+    plainMessage =
+
+      "We understand that your responsibilities as a Manager may not necessarily end at an exact time. " +
+
+      "However, for purposes of daily attendance recording, you may complete your Time-Out on or before 11:59 PM today " +
+
+      "to ensure that your attendance is properly recorded under the correct date.";
+
+
+    htmlMessage = `
+
+      <p>
+
+        We understand that your responsibilities as a
+        <strong>Manager</strong> may not necessarily end at an exact time.
+
+      </p>
+
+      <p>
+
+        However, for purposes of
+        <strong>daily attendance recording</strong>,
+        you may complete your Time-Out on or before
+        <strong>11:59 PM today</strong>
+        to ensure that your attendance is properly recorded
+        under the correct date.
+
+      </p>
+
+      <div style="
+        background:#fff8e8;
+        border-left:4px solid #d99a00;
+        padding:12px 14px;
+        margin:20px 0;
+        border-radius:6px;
+      ">
+
+        <strong>
+          Daily Attendance Cut-Off
+        </strong>
+
+        <br><br>
+
+        Please ensure that your Time-Out is submitted
+        no later than <strong>11:59 PM today</strong>.
+
+      </div>
+
+    `;
+
+  }
+
+
+  // ==================================================
+  // PLAIN TEXT EMAIL
+  // ==================================================
+
+  const plainBody =
+
+    "Dear " +
+    managerName +
+    ",\n\n" +
+
+    plainMessage +
+
+    "\n\n" +
+
+    "Click this link to Time-Out:\n" +
+
+    timeOutLink +
+
+    "\n\n" +
+
+    "Biometrics remains the primary attendance record. " +
+
+    "The Manager Attendance Portal serves as the secondary attendance recording method when biometrics cannot be used." +
+
+    "\n\n" +
+
+    "Thank you." +
+
+    "\n\n" +
+
+    "Human Resources Department\n" +
+
+    "KHealth / Careview Corporation";
+
+
+  // ==================================================
+  // HTML EMAIL
+  // ==================================================
+
+  const htmlBody = `
+
+    <div style="
+      font-family:Arial,sans-serif;
+      color:#222;
+      line-height:1.6;
+      max-width:600px;
+    ">
+
+      <p>
+
+        Dear
+        <strong>
+          ${escapeHtml_(managerName)}
+        </strong>,
+
+      </p>
+
+
+      ${htmlMessage}
+
+
+      <p style="
+        margin:28px 0;
+      ">
+
+        <a
+
+          href="${timeOutLink}"
+
+          style="
+            display:inline-block;
+            background:#163f73;
+            color:#ffffff;
+            padding:13px 22px;
+            border-radius:6px;
+            text-decoration:none;
+            font-weight:bold;
+          ">
+
+          CLICK THIS LINK TO TIME-OUT
+
+        </a>
+
+      </p>
+
+
+      <p style="
+        font-size:13px;
+        color:#555;
+      ">
+
+        Biometrics remains the primary attendance record.
+        The Manager Attendance Portal serves as the
+        secondary attendance recording method when
+        biometrics cannot be used.
+
+      </p>
+
+
+      <p>
+
+        Thank you.
+
+      </p>
+
+
+      <p>
+
+        <strong>
+          Human Resources Department
+        </strong>
+
+        <br>
+
+        KHealth / Careview Corporation
+
+      </p>
+
+    </div>
+
+  `;
+
+
+  MailApp.sendEmail({
+
+    to:
+      email,
+
+    subject:
+      subject,
+
+    body:
+      plainBody,
+
+    htmlBody:
+      htmlBody,
+
+    name:
+      "KHealth / Careview HR"
+
+  });
+
+}
+
+
+// ======================================================
+// WORK SCHEDULE
+// START + 9 HOURS
+// ======================================================
+
+function calculateSchedule_(
+  workStart,
+  currentDate
+) {
+
+
+  if (
+    !/^\d{2}:\d{2}$/.test(
+      workStart
+    )
+  ) {
+
+    throw new Error(
+      "Invalid Work Schedule."
+    );
+
+  }
+
+
+  const dateString =
+    Utilities.formatDate(
+      currentDate,
+      TIME_ZONE,
+      "yyyy-MM-dd"
+    );
+
+
+  const start =
+    new Date(
+
+      dateString +
+
+      "T" +
+
+      workStart +
+
+      ":00+08:00"
+
+    );
+
+
+  if (
+    isNaN(
+      start.getTime()
+    )
+  ) {
+
+    throw new Error(
+      "Invalid starting time."
+    );
+
+  }
+
+
+  const end =
+    new Date(
+
+      start.getTime() +
+
+      (9 * 60 * 60 * 1000)
+
+    );
+
+
+  const startDisplay =
+    Utilities.formatDate(
+      start,
+      TIME_ZONE,
+      "hh:mm a"
+    );
+
+
+  const endDisplay =
+    Utilities.formatDate(
+      end,
+      TIME_ZONE,
+      "hh:mm a"
+    );
+
+
+  const startDate =
+    Utilities.formatDate(
+      start,
+      TIME_ZONE,
+      "yyyy-MM-dd"
+    );
+
+
+  const endDate =
+    Utilities.formatDate(
+      end,
+      TIME_ZONE,
+      "yyyy-MM-dd"
+    );
+
+
+  const nextDay =
+    startDate !== endDate;
+
+
+  return {
+
+    start:
+      start,
+
+    end:
+      end,
+
+    display:
+
+      startDisplay +
+
+      " to " +
+
+      endDisplay +
+
+      (
+        nextDay
+          ? " (+1 day)"
+          : ""
+      )
+
+  };
+
+}
+
+
+// ======================================================
+// GET MANAGER EMAIL
+// ======================================================
+
+function getManagerEmail_(
+  managerName
+) {
+
+
+  const ss =
+    getSpreadsheet_();
+
+
+  const sheet =
+    ss.getSheetByName(
+      DIRECTORY_SHEET
+    );
+
+
+  if (!sheet) {
+
+    return "";
+
+  }
+
+
+  const lastRow =
+    sheet.getLastRow();
+
+
+  if (
+    lastRow < 2
+  ) {
+
+    return "";
+
+  }
+
+
+  const data =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        2
+      )
+      .getDisplayValues();
+
+
+  for (
+    let i = 0;
+    i < data.length;
+    i++
+  ) {
+
+
+    const name =
+      String(
+        data[i][0] || ""
+      ).trim();
+
+
+    const email =
+      String(
+        data[i][1] || ""
+      ).trim();
+
+
+    if (
+      name === managerName
+    ) {
+
+      return email;
+
+    }
+
+  }
+
+
+  return "";
+
+}
+
+
+// ======================================================
+// CREATE 1-MINUTE REMINDER TRIGGER
+// ======================================================
+
+function createReminderTrigger_() {
+
+
+  const functionName =
+    "sendDueAttendanceReminders";
+
+
+  const triggers =
+    ScriptApp.getProjectTriggers();
+
+
+  triggers.forEach(
+    function(trigger) {
+
+
+      if (
+        trigger.getHandlerFunction() ===
+        functionName
+      ) {
+
+        ScriptApp.deleteTrigger(
+          trigger
+        );
+
+      }
+
+    }
   );
 
-</script>
 
-</body>
+  ScriptApp
+    .newTrigger(
+      functionName
+    )
+    .timeBased()
+    .everyMinutes(1)
+    .create();
 
-</html>
+}
+
+
+// ======================================================
+// SAVE SELFIE
+// ======================================================
+
+function saveSelfie_(
+  dataUrl,
+  name,
+  category,
+  timestamp
+) {
+
+
+  if (
+    !dataUrl.startsWith(
+      "data:image/"
+    )
+  ) {
+
+    throw new Error(
+      "Invalid selfie image."
+    );
+
+  }
+
+
+  const commaIndex =
+    dataUrl.indexOf(",");
+
+
+  if (
+    commaIndex === -1
+  ) {
+
+    throw new Error(
+      "Invalid selfie information."
+    );
+
+  }
+
+
+  const metadata =
+    dataUrl.substring(
+      0,
+      commaIndex
+    );
+
+
+  let base64Data =
+    dataUrl.substring(
+      commaIndex + 1
+    );
+
+
+  base64Data =
+    base64Data.replace(
+      / /g,
+      "+"
+    );
+
+
+  let mimeType =
+    "image/jpeg";
+
+
+  let extension =
+    "jpg";
+
+
+  if (
+    metadata.includes(
+      "image/png"
+    )
+  ) {
+
+    mimeType =
+      "image/png";
+
+    extension =
+      "png";
+
+  }
+
+
+  if (
+    metadata.includes(
+      "image/webp"
+    )
+  ) {
+
+    mimeType =
+      "image/webp";
+
+    extension =
+      "webp";
+
+  }
+
+
+  const bytes =
+    Utilities.base64Decode(
+      base64Data
+    );
+
+
+  const safeName =
+    name.replace(
+      /[^a-zA-Z0-9]/g,
+      "_"
+    );
+
+
+  const dateTime =
+    Utilities.formatDate(
+      timestamp,
+      TIME_ZONE,
+      "yyyyMMdd_HHmmss"
+    );
+
+
+  const fileName =
+
+    safeName +
+
+    "_" +
+
+    category.replace(
+      "-",
+      ""
+    ) +
+
+    "_" +
+
+    dateTime +
+
+    "." +
+
+    extension;
+
+
+  const blob =
+    Utilities.newBlob(
+      bytes,
+      mimeType,
+      fileName
+    );
+
+
+  const file =
+    getSelfieFolder_()
+      .createFile(
+        blob
+      );
+
+
+  return file.getUrl();
+
+}
+
+
+// ======================================================
+// GET / CREATE SELFIE FOLDER
+// ======================================================
+
+function getSelfieFolder_() {
+
+
+  const props =
+    PropertiesService.getScriptProperties();
+
+
+  const existingId =
+    props.getProperty(
+      "SELFIE_FOLDER_ID"
+    );
+
+
+  if (
+    existingId
+  ) {
+
+
+    try {
+
+      return DriveApp
+        .getFolderById(
+          existingId
+        );
+
+    } catch (error) {
+
+      // Create/recover below.
+
+    }
+
+  }
+
+
+  const folders =
+    DriveApp.getFoldersByName(
+      SELFIE_FOLDER_NAME
+    );
+
+
+  let folder;
+
+
+  if (
+    folders.hasNext()
+  ) {
+
+    folder =
+      folders.next();
+
+  } else {
+
+    folder =
+      DriveApp.createFolder(
+        SELFIE_FOLDER_NAME
+      );
+
+  }
+
+
+  props.setProperty(
+    "SELFIE_FOLDER_ID",
+    folder.getId()
+  );
+
+
+  return folder;
+
+}
+
+
+// ======================================================
+// GET SPREADSHEET
+// ======================================================
+
+function getSpreadsheet_() {
+
+
+  const id =
+    PropertiesService
+      .getScriptProperties()
+      .getProperty(
+        "SPREADSHEET_ID"
+      );
+
+
+  if (!id) {
+
+    throw new Error(
+      "System is not initialized. Please run setupSystem() first."
+    );
+
+  }
+
+
+  return SpreadsheetApp.openById(
+    id
+  );
+
+}
+
+
+// ======================================================
+// SUCCESS PAGE
+// ======================================================
+
+function successPage_(
+  name,
+  category,
+  workSchedule,
+  recordedTime,
+  earlyReason
+) {
+
+
+  let earlySection = "";
+
+
+  if (
+    earlyReason
+  ) {
+
+    earlySection = `
+
+      <div style="
+        margin-top:18px;
+        background:#fff8e8;
+        padding:12px;
+        border-radius:8px;
+      ">
+
+        <strong>
+          Early Time-Out Reason
+        </strong>
+
+        <br><br>
+
+        ${escapeHtml_(earlyReason)}
+
+      </div>
+
+    `;
+
+  }
+
+
+  return HtmlService.createHtmlOutput(`
+
+    <!DOCTYPE html>
+
+    <html>
+
+      <head>
+
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1">
+
+      </head>
+
+
+      <body style="
+        margin:0;
+        background:#f3f5f7;
+        font-family:Arial;
+        text-align:center;
+        padding:30px 15px;
+      ">
+
+
+        <div style="
+          max-width:420px;
+          margin:auto;
+          background:#ffffff;
+          padding:30px;
+          border-radius:15px;
+        ">
+
+
+          <div style="
+            font-size:60px;
+            color:#2e7d32;
+          ">
+
+            ✓
+
+          </div>
+
+
+          <h2>
+            Attendance Recorded
+          </h2>
+
+
+          <p>
+            <strong>
+              ${escapeHtml_(name)}
+            </strong>
+          </p>
+
+
+          <p>
+            ${escapeHtml_(category)}
+          </p>
+
+
+          <p>
+            ${escapeHtml_(workSchedule)}
+          </p>
+
+
+          <p>
+            ${escapeHtml_(recordedTime)}
+          </p>
+
+
+          ${earlySection}
+
+
+        </div>
+
+
+      </body>
+
+    </html>
+
+  `);
+
+}
+
+
+// ======================================================
+// ERROR PAGE
+// ======================================================
+
+function errorPage_(
+  message
+) {
+
+
+  return HtmlService.createHtmlOutput(`
+
+    <!DOCTYPE html>
+
+    <html>
+
+      <head>
+
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1">
+
+      </head>
+
+
+      <body style="
+        margin:0;
+        background:#f3f5f7;
+        font-family:Arial;
+        text-align:center;
+        padding:30px 15px;
+      ">
+
+
+        <div style="
+          max-width:420px;
+          margin:auto;
+          background:white;
+          padding:30px;
+          border-radius:15px;
+        ">
+
+
+          <h2 style="
+            color:#b71c1c;
+          ">
+
+            Attendance Not Recorded
+
+          </h2>
+
+
+          <p>
+
+            ${escapeHtml_(message)}
+
+          </p>
+
+
+        </div>
+
+
+      </body>
+
+    </html>
+
+  `);
+
+}
+
+
+// ======================================================
+// HTML SECURITY
+// ======================================================
+
+function escapeHtml_(
+  text
+) {
+
+
+  return String(
+    text || ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
