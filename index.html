@@ -864,28 +864,100 @@ before your designated end of shift.
 
 </div>
 
-
 <!-- ================================================
-TIME-OUT GPS
+TIME-OUT LOCATION
 ================================================ -->
 
-<label>
-Actual Location
+<label for="timeOutLocation">
+Location
 </label>
 
+<select
+  id="timeOutLocation"
+  onchange="timeOutLocationChanged()">
+
+<option value="">
+Select Location
+</option>
+
+<option value="KHealth Cyclotron Facility">
+KHealth Cyclotron Facility
+</option>
+
+<option value="KHealth Office">
+KHealth Office
+</option>
+
+<option value="NKTI">
+NKTI
+</option>
+
+<option value="CCC-BGC">
+CCC-BGC
+</option>
+
+<option value="AUF">
+AUF
+</option>
+
+<option value="MMMC">
+MMMC
+</option>
+
+<option value="Centuria (PET & Carecall)">
+Centuria (PET & Carecall)
+</option>
+
+<option value="Manila PET">
+Manila PET
+</option>
+
+<option value="BEM Office">
+BEM Office
+</option>
+
+<option value="SM Val">
+SM Val
+</option>
+
+<option value="Others">
+Others
+</option>
+
+</select>
 
 <div
-  id="timeOutGpsBox"
-  class="gps-box"
-  style="display:block;">
+  id="timeOutOffsiteBox"
+  class="offsite-box">
 
+<label for="timeOutOffsiteReason">
+Reason why timing out not on a KHealth/Careview site
+</label>
 
-<div id="timeOutGpsStatus">
+<textarea
+  name="offsiteReason"
+  id="timeOutOffsiteReason"
+  rows="4"
+  disabled
+  placeholder="Please explain why you are timing out outside a KHealth/Careview site.">
+</textarea>
 
-Getting your actual GPS location...
+<div class="small-note">
+When <strong>Others</strong> is selected, both the written
+explanation and actual GPS location are mandatory.
+</div>
 
 </div>
 
+<!-- GPS FOR TIME-OUT OTHERS ONLY -->
+
+<div
+  id="timeOutGpsBox"
+  class="gps-box">
+
+<div id="timeOutGpsStatus">
+Getting your actual GPS location...
+</div>
 
 <button
   type="button"
@@ -896,12 +968,9 @@ Retry GPS Location
 
 </button>
 
-
 </div>
 
-
-</div>
-
+</div>  
 
 <!-- ================================================
 HIDDEN DATA
@@ -1222,7 +1291,75 @@ function categoryChanged() {
   resetSelfie();
 
   resetScheduleLookup();
+document
+  .getElementById(
+    "timeInLocation"
+  )
+  .value =
+  "";
 
+document
+  .getElementById(
+    "timeOutLocation"
+  )
+  .value =
+  "";
+
+document
+  .getElementById(
+    "offsiteBox"
+  )
+  .style.display =
+  "none";
+
+document
+  .getElementById(
+    "timeInGpsBox"
+  )
+  .style.display =
+  "none";
+
+document
+  .getElementById(
+    "timeOutOffsiteBox"
+  )
+  .style.display =
+  "none";
+
+document
+  .getElementById(
+    "timeOutGpsBox"
+  )
+  .style.display =
+  "none";
+
+const timeInOffsiteReason =
+  document.getElementById(
+    "offsiteReason"
+  );
+
+timeInOffsiteReason.value =
+  "";
+
+timeInOffsiteReason.required =
+  false;
+
+timeInOffsiteReason.disabled =
+  true;
+
+const timeOutOffsiteReason =
+  document.getElementById(
+    "timeOutOffsiteReason"
+  );
+
+timeOutOffsiteReason.value =
+  "";
+
+timeOutOffsiteReason.required =
+  false;
+
+timeOutOffsiteReason.disabled =
+  true;
 
   document
     .getElementById(
@@ -1279,6 +1416,13 @@ function categoryChanged() {
     selfieSection.style.display =
       "block";
 
+    document
+  .getElementById(
+    "offsiteReason"
+  )
+  .disabled =
+  false;
+
   }
 
 
@@ -1299,14 +1443,6 @@ function categoryChanged() {
       "block";
 
 
-    document
-      .getElementById(
-        "finalLocation"
-      )
-      .value =
-      "Actual GPS Location";
-
-
     updateTimeOutClock();
 
 
@@ -1316,10 +1452,6 @@ function categoryChanged() {
         1000
       );
 
-
-    getGps(
-      "timeOutGpsStatus"
-    );
 
 
     loadTimeOutSchedule();
@@ -1685,7 +1817,92 @@ function timeInLocationChanged() {
   }
 
 }
+/* ================================================
+TIME-OUT LOCATION
+================================================ */
 
+function timeOutLocationChanged() {
+
+  const location =
+    document
+      .getElementById(
+        "timeOutLocation"
+      )
+      .value;
+
+  const offsiteBox =
+    document
+      .getElementById(
+        "timeOutOffsiteBox"
+      );
+
+  const offsiteReason =
+    document
+      .getElementById(
+        "timeOutOffsiteReason"
+      );
+
+  const gpsBox =
+    document
+      .getElementById(
+        "timeOutGpsBox"
+      );
+
+  document
+    .getElementById(
+      "finalLocation"
+    )
+    .value =
+    location;
+
+  resetGps();
+
+  if (
+    location === "Others"
+  ) {
+
+    offsiteBox.style.display =
+      "block";
+
+    gpsBox.style.display =
+      "block";
+
+    offsiteReason.disabled =
+      false;
+
+    offsiteReason.required =
+      true;
+
+    document
+      .getElementById(
+        "timeOutGpsStatus"
+      )
+      .innerHTML =
+      "Getting your actual GPS location...";
+
+    getGps(
+      "timeOutGpsStatus"
+    );
+
+  } else {
+
+    offsiteBox.style.display =
+      "none";
+
+    gpsBox.style.display =
+      "none";
+
+    offsiteReason.value =
+      "";
+
+    offsiteReason.required =
+      false;
+
+    offsiteReason.disabled =
+      true;
+  }
+}
+  
 
 
 /* ================================================
@@ -2688,32 +2905,77 @@ document
         }
 
 
-        /* ================================================
-        TIME-OUT GPS
-        ================================================ */
+       
+/* ================================================
+TIME-OUT LOCATION
+================================================ */
 
-        if (
-          !gpsCaptured
-        ) {
+const timeOutLocation =
+  document
+    .getElementById(
+      "timeOutLocation"
+    )
+    .value;
 
+if (!timeOutLocation) {
 
-          event.preventDefault();
+  event.preventDefault();
 
+  alert(
+    "Please select your Time-Out Location."
+  );
 
-          alert(
-            "Your actual GPS location must be captured before Time-Out can be submitted."
-          );
+  document
+    .getElementById(
+      "timeOutLocation"
+    )
+    .focus();
 
+  return;
+}
 
-          getGps(
-            "timeOutGpsStatus"
-          );
+if (timeOutLocation === "Others") {
 
+  const timeOutReason =
+    document
+      .getElementById(
+        "timeOutOffsiteReason"
+      )
+      .value
+      .trim();
 
-          return;
+  if (!timeOutReason) {
 
-        }
+    event.preventDefault();
 
+    alert(
+      "Please provide the reason why you are timing out outside a KHealth/Careview site."
+    );
+
+    document
+      .getElementById(
+        "timeOutOffsiteReason"
+      )
+      .focus();
+
+    return;
+  }
+
+  if (!gpsCaptured) {
+
+    event.preventDefault();
+
+    alert(
+      "Your actual GPS location must be captured when Others is selected."
+    );
+
+    getGps(
+      "timeOutGpsStatus"
+    );
+
+    return;
+  }
+}
       }
 
 
